@@ -223,91 +223,89 @@ console.log("getDiscountInfo():", store.getDiscountInfo());
 //   - `name` không được rỗng sau khi `trim()`.
 //   - `price` và `quantity` phải lớn hơn 0.
 //   - Nếu không hợp lệ, trả về:
-class Cart{
+class Cart {
   #items = [];
-  addItem(item){
-     if (this.#items.some((p) => p.name.trim().toLowerCase() === item.name.trim().toLowerCase())) {
+  addItem(item) {
+    if (
+      this.#items.some(
+        (p) => p.name.trim().toLowerCase() === item.name.trim().toLowerCase(),
+      )
+    ) {
       //  item.quantity+=p.quantity;
       return {
         success: false,
         message: "Duplicated name",
       };
-    }else if(item.name.trim()===""){
+    } else if (item.name.trim() === "") {
       return {
         success: false,
         message: "Name should not be blank",
       };
-    }else if(item.price<= 0){
+    } else if (item.price <= 0) {
       return {
         success: false,
         message: "Price should be greater than 0",
       };
-    }else if(item.quantity<= 0){
+    } else if (item.quantity <= 0) {
       return {
         success: false,
         message: "Quantity should be greater than 0",
       };
-    }else{
+    } else {
       this.#items.push(item);
-       return {
+      return {
         success: true,
         message: "Thêm vào giỏ hàng thành công",
       };
     }
   }
-  
+
   // - Method `removeItem(name)`:
-//   - Xóa item theo tên.
-// - Method `getSubtotal()`:
-//   - Tính tổng tiền trước giảm giá.
-// - Method `applyCoupon(code)`:
-//   - Nhận mã như `"SALE10"` hoặc `"SALE20"`.
-//   - Nếu mã hợp lệ, giảm 10% hoặc 20%.
-//   - Nếu mã không hợp lệ, không giảm.
-//   - Trả về `true` nếu áp dụng được mã, ngược lại trả về `false`.
-// - Method `checkout()`:
-//   - Trả về object gồm `items`, `subtotal`, `discount`, `total`.
-  removeItem(name){
-    const newNames = this.#items.filter(item => item.name !== name);
+  //   - Xóa item theo tên.
+  // - Method `getSubtotal()`:
+  //   - Tính tổng tiền trước giảm giá.
+  // - Method `applyCoupon(code)`:
+  //   - Nhận mã như `"SALE10"` hoặc `"SALE20"`.
+  //   - Nếu mã hợp lệ, giảm 10% hoặc 20%.
+  //   - Nếu mã không hợp lệ, không giảm.
+  //   - Trả về `true` nếu áp dụng được mã, ngược lại trả về `false`.
+  // - Method `checkout()`:
+  //   - Trả về object gồm `items`, `subtotal`, `discount`, `total`.
+  removeItem(name) {
+    const newNames = this.#items.filter((item) => item.name !== name);
     return newNames;
   }
-  getSubtotal(){
-     let subtotal = 0;
-     for (const item of this.#items) {
-       subtotal += item.price * item.quantity;
-     }
+  getSubtotal() {
+    let subtotal = 0;
+    for (const item of this.#items) {
+      subtotal += item.price * item.quantity;
+    }
     return subtotal;
-    
   }
-  
-  applyCoupon(code){
-    let discountPerCent
-    if(code==="SALE10"){
+
+  applyCoupon(code) {
+    let discountPerCent;
+    if (code === "SALE10") {
       discountPerCent = 10;
-      this.subtotal = this.subtotal*discountPerCent/100;
+      this.subtotal = (this.subtotal * discountPerCent) / 100;
       return true;
-    }else if(code==="SALE20"){
+    } else if (code === "SALE20") {
       discountPerCent = 20;
-      this.subtotal = this.subtotal*discountPerCent/100;
+      this.subtotal = (this.subtotal * discountPerCent) / 100;
       return true;
-    }else{
+    } else {
       return false;
     }
-    
   }
-  checkout(){
+  checkout() {
     return {
       items: this.#items,
       subtotal: this.getSubtotal(),
       discount: this.applyCoupon(),
-      total: 0
-    }
+      total: 0,
+    };
   }
-  
 }
-
-
-
 
 // Tạo class con `VipCart extends Cart`:
 
@@ -320,24 +318,24 @@ class Cart{
 //   - Thêm `memberName` và `cartType: "VIP"` vào object kết quả.
 
 class VipCart extends Cart {
-  constructor(memberName){
+  constructor(memberName) {
     super();
     this.memberName = memberName;
   }
-  applyCoupon(code){
+  applyCoupon(code) {
     super.applyCoupon(code);
-    if(code!=="SALE10" && code!=="SALE20"){
+    if (code !== "SALE10" && code !== "SALE20") {
       code = "VIP30";
       this.discountPercent = 0.3;
     }
   }
-  checkout(){
+  checkout() {
     super.checkout();
     return {
       ...super.checkout(),
-       memberName: this.memberName,
-      cartType: "VIP"
-    }
+      memberName: this.memberName,
+      cartType: "VIP",
+    };
   }
 }
 // Bài test mẫu:
@@ -345,23 +343,29 @@ class VipCart extends Cart {
 // ```javascript
 const cart = new VipCart("Neko");
 
-console.log(cart.addItem({
-  name: "Trà sữa trân châu",
-  price: 30000,
-  quantity: 2,
-}));
+console.log(
+  cart.addItem({
+    name: "Trà sữa trân châu",
+    price: 30000,
+    quantity: 2,
+  }),
+);
 
-console.log(cart.addItem({
-  name: "  trà SỮA trân châu  ",
-  price: 30000,
-  quantity: 1,
-}));
+console.log(
+  cart.addItem({
+    name: "  trà SỮA trân châu  ",
+    price: 30000,
+    quantity: 1,
+  }),
+);
 
-console.log(cart.addItem({
-  name: "Trà đào",
-  price: 25000,
-  quantity: 1,
-}));
+console.log(
+  cart.addItem({
+    name: "Trà đào",
+    price: 25000,
+    quantity: 1,
+  }),
+);
 
 console.log(cart.applyCoupon(" vip30 "));
 console.log(cart.checkout());
